@@ -80,6 +80,12 @@ writable by the user executing the script.  It can be a Linux style directory
 (`C:\Users\Username\Downloads`):
 
     download-location:  \\megatron\mila\games\humble bundle
+## Usage
+Once the configuration file has the minimum configurations options set (`session-cookie`,`download-location` and `download-platforms`) you can run `hb-downloader.py --help` to see commands.
+
+`list` by default will list all owned bundles by `Bundle ID` `Date` and the Human name alphabetically. The sub option `--sort-by-date` sorts the output by old to new. 
+
+`download` by default will download all the bundles, again in alphabetical order. Note. Large numbers of bundles will take a long time, especially if bundles are already downloaded as existing bundles md5ums are checked for changes against the upstream, for updates or changes. The sub option `--bundle-id` will just download that bundle id, as show via `list`
 
 ## Issues
 If you encounter any issues or have suggestions, please [open a **NEW**
