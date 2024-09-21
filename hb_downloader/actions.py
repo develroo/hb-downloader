@@ -97,3 +97,49 @@ class Action:
                 ProgressTracker.item_count_current += 1
 
         logger.display_message(False, "Processing", "Finished.")
+
+    @staticmethod
+    def bundle_download(hapi, order):
+        # Extract game_key from the order object
+        game_key = order.gamekey
+
+        ProgressTracker.reset()
+        ProgressTracker.item_count_total = 1  # Only one bundle to process
+
+        # Retrieve order details for the given bundle
+        logger.display_message(
+            False, "Processing", 
+            f"Retrieving order details for order {game_key}."
+        )
+
+        # Fetch the downloads for the single bundle
+        humble_downloads = HumbleDownload.needed_downloads_from_key(hapi, game_key)
+
+        if len(humble_downloads) == 0:
+            logger.display_message(False, "Error", f"No downloads found for order {game_key}.")
+            return
+
+        download_size_total = sum(dl.humble_file_size for dl in humble_downloads)
+        ProgressTracker.download_size_total = download_size_total
+        ProgressTracker.item_count_total = len(humble_downloads)
+
+        # Update download URLs in case they expired
+        HumbleDownload.update_download_list_url(hapi, humble_downloads)
+
+        # Download each file for the single bundle
+        for hd in humble_downloads:
+            ProgressTracker.assign_download(hd)
+            ProgressTracker.display_summary()
+
+            logger.display_message(False, "Download", hd.status_message)
+            logger.display_message(False, "Download", f"Downloading {hd.humble_file_size_human}.")
+
+            # Download the file
+            hd.download_file()
+
+            # Update progress
+            if hd.humble_file_size is not None:
+                ProgressTracker.download_size_current += hd.humble_file_size
+            ProgressTracker.item_count_current += 1
+
+        logger.display_message(False, "Complete", f"Finished downloading bundle {game_key}.")
